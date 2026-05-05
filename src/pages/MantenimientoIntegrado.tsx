@@ -138,122 +138,173 @@ export default function MantenimientoIntegrado() {
         <div className="space-y-4">
             {toast && <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg text-sm font-bold ${toast.type === 'ok' ? 'bg-emerald-600' : 'bg-red-600'} text-white`}>{toast.msg}</div>}
 
-            {/* Header */}
-            <div className="flex items-center justify-between">
+            {/* Header Premium */}
+            <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-xl font-black text-white uppercase tracking-tight">Mantenimiento Integrado</h1>
-                    <p className="text-xs text-slate-400 mt-0.5">Registro unificado para flota y estaciones hídricas</p>
+                    <h1 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight flex items-center gap-3">
+                        <span className="material-symbols-outlined text-cyan-400 text-3xl md:text-4xl">engineering</span>
+                        Mantenimiento Integrado
+                    </h1>
+                    <p className="text-[11px] md:text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Registro unificado para flota y estaciones hídricas</p>
                 </div>
                 <button onClick={() => setShowForm(true)} disabled={!selectedId}
-                    className="bg-sky-600 hover:bg-sky-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-black uppercase px-4 py-2 rounded-lg flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">add_task</span> Nuevo Registro
+                    className="btn-premium btn-premium-cyan text-[10px] md:text-xs uppercase flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <span className="material-symbols-outlined text-base">add_task</span> 
+                    <span className="hidden sm:inline">Nuevo Registro</span>
                 </button>
             </div>
 
-            {/* Selector de activo */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {assetType !== 'stations' && (
-                    <select value={selectedType === 'vehicle' ? (selectedId ?? '') : ''} onChange={e => { setSelectedType('vehicle'); setSelectedId(e.target.value ? Number(e.target.value) : null) }}
-                        className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-sky-500">
-                        <option value="">🚗 Seleccionar vehículo...</option>
-                        {vehicles.map(v => <option key={v.id} value={v.id}>{v.codigo_patrimonial} — {v.placa_principal || v.tipo_unidad}</option>)}
-                    </select>
-                )}
-                {assetType !== 'fleet' && (
-                    <select value={selectedType === 'station' ? (selectedId ?? '') : ''} onChange={e => { setSelectedType('station'); setSelectedId(e.target.value ? Number(e.target.value) : null) }}
-                        className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-sky-500">
-                        <option value="">📍 Seleccionar estación...</option>
-                        {stations.map(s => <option key={s.id} value={s.id}>{s.codigo} — {s.nombre} ({s.tipo})</option>)}
-                    </select>
-                )}
-            </div>
+            {/* Filtros de Búsqueda (Glassmorphism) */}
+            <div className="glass-morphism rounded-[2rem] p-5 sm:p-6 mb-8 space-y-4 shadow-xl">
+                <div className="flex items-center gap-2 mb-2">
+                    <span className="material-symbols-outlined text-cyan-400">filter_list</span>
+                    <h3 className="text-xs font-black text-white uppercase tracking-widest">Filtros de Búsqueda</h3>
+                </div>
+                
+                {/* Selector de activo */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {assetType !== 'stations' && (
+                        <div className="relative group">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 group-hover:text-cyan-400 transition-colors">directions_car</span>
+                            <select value={selectedType === 'vehicle' ? (selectedId ?? '') : ''} onChange={e => { setSelectedType('vehicle'); setSelectedId(e.target.value ? Number(e.target.value) : null) }}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition-all appearance-none outline-none">
+                                <option value="">Seleccionar vehículo...</option>
+                                {vehicles.map(v => <option key={v.id} value={v.id}>{v.codigo_patrimonial} — {v.placa_principal || v.tipo_unidad}</option>)}
+                            </select>
+                        </div>
+                    )}
+                    {assetType !== 'fleet' && (
+                        <div className="relative group">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-400 group-hover:text-purple-400 transition-colors">location_on</span>
+                            <select value={selectedType === 'station' ? (selectedId ?? '') : ''} onChange={e => { setSelectedType('station'); setSelectedId(e.target.value ? Number(e.target.value) : null) }}
+                                className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all appearance-none outline-none">
+                                <option value="">Seleccionar estación...</option>
+                                {stations.map(s => <option key={s.id} value={s.id}>{s.codigo} — {s.nombre} ({s.tipo})</option>)}
+                            </select>
+                        </div>
+                    )}
+                </div>
 
-            {/* Filtros */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input type="date" value={filterDesde} onChange={e => setFilterDesde(e.target.value)}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-sky-500" />
-                <input type="date" value={filterHasta} onChange={e => setFilterHasta(e.target.value)}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-sky-500" />
-                <select value={filterTipo} onChange={e => setFilterTipo(e.target.value)}
-                    className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-sky-500">
-                    <option value="">Todos los tipos</option>
-                    <option value="preventivo">Preventivo</option>
-                    <option value="correctivo">Correctivo</option>
-                    <option value="emergencia">Emergencia</option>
-                </select>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-800/50 pt-4 mt-4">
+                    <div className="relative group">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-sm">calendar_today</span>
+                        <input type="date" value={filterDesde} onChange={e => setFilterDesde(e.target.value)}
+                            className="w-full bg-slate-900/30 border border-slate-700/50 rounded-lg pl-9 pr-3 py-2.5 text-xs font-mono text-slate-300 focus:ring-1 focus:ring-cyan-500 outline-none transition-all" />
+                    </div>
+                    <div className="relative group">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-sm">calendar_today</span>
+                        <input type="date" value={filterHasta} onChange={e => setFilterHasta(e.target.value)}
+                            className="w-full bg-slate-900/30 border border-slate-700/50 rounded-lg pl-9 pr-3 py-2.5 text-xs font-mono text-slate-300 focus:ring-1 focus:ring-cyan-500 outline-none transition-all" />
+                    </div>
+                    <div className="relative group">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-slate-500 text-sm">category</span>
+                        <select value={filterTipo} onChange={e => setFilterTipo(e.target.value)}
+                            className="w-full bg-slate-900/30 border border-slate-700/50 rounded-lg pl-9 pr-3 py-2.5 text-xs text-slate-300 focus:ring-1 focus:ring-cyan-500 outline-none appearance-none transition-all">
+                            <option value="">Todos los tipos</option>
+                            <option value="preventivo">Preventivo</option>
+                            <option value="correctivo">Correctivo</option>
+                            <option value="emergencia">Emergencia</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             {currentItem ? (
                 <>
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4">
-                            <div className="text-xs text-slate-400 font-bold uppercase">Registros</div>
-                            <div className="text-2xl font-black text-white">{maintenanceLog.length}</div>
+                    {/* Stats Premium */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-slate-700/50 rounded-[1.5rem] p-6 shadow-xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span className="material-symbols-outlined text-5xl">list_alt</span></div>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2">Registros Totales</span>
+                            <div className="text-4xl font-black text-white tracking-tighter">{maintenanceLog.length}</div>
                         </div>
-                        <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4">
-                            <div className="text-xs text-slate-400 font-bold uppercase">Costo Total</div>
-                            <div className="text-2xl font-black text-emerald-400">S/ {totalCosto.toFixed(2)}</div>
+                        
+                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-emerald-500/20 rounded-[1.5rem] p-6 shadow-xl relative overflow-hidden group hover:border-emerald-500/40 transition-colors">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span className="material-symbols-outlined text-5xl text-emerald-400">payments</span></div>
+                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.3em] block mb-2">Costo Total</span>
+                            <div className="text-4xl font-black text-emerald-400 tracking-tighter">S/ {totalCosto.toFixed(2)}</div>
                         </div>
-                        <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4">
-                            <div className="text-xs text-slate-400 font-bold uppercase">Horas</div>
-                            <div className="text-2xl font-black text-sky-400">{totalHoras.toFixed(2)}h</div>
+                        
+                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-sky-500/20 rounded-[1.5rem] p-6 shadow-xl relative overflow-hidden group hover:border-sky-500/40 transition-colors">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span className="material-symbols-outlined text-5xl text-sky-400">schedule</span></div>
+                            <span className="text-[10px] font-black text-sky-400 uppercase tracking-[0.3em] block mb-2">Horas Invertidas</span>
+                            <div className="text-4xl font-black text-sky-400 tracking-tighter">{totalHoras.toFixed(2)}<span className="text-xl ml-1 text-slate-500">h</span></div>
                         </div>
-                        <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-4">
-                            <div className="text-xs text-slate-400 font-bold uppercase">Componentes</div>
-                            <div className="text-2xl font-black text-amber-400">{items.length}</div>
+                        
+                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-amber-500/20 rounded-[1.5rem] p-6 shadow-xl relative overflow-hidden group hover:border-amber-500/40 transition-colors">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><span className="material-symbols-outlined text-5xl text-amber-400">extension</span></div>
+                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em] block mb-2">Componentes</span>
+                            <div className="text-4xl font-black text-white tracking-tighter">{items.length}</div>
                         </div>
                     </div>
 
-                    {/* Tabla */}
-                    <div className="bg-slate-800/50 rounded-xl border border-slate-700/50 overflow-hidden">
-                        <div className="px-4 py-3 border-b border-slate-700/50 flex items-center justify-between">
-                            <h2 className="text-sm font-black text-white uppercase">
-                                {selectedType === 'station' ? '📍' : '🚗'} {currentItem.nombre || currentItem.placa_principal || currentItem.codigo_patrimonial} — Historial
-                            </h2>
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${selectedType === 'station' ? 'bg-purple-500/20 text-purple-400' : 'bg-sky-500/20 text-sky-400'}`}>
+                    {/* Tabla Premium */}
+                    <div className="premium-card p-0 overflow-hidden">
+                        <div className="px-6 py-5 border-b border-slate-800/50 flex items-center justify-between bg-slate-900/40">
+                            <div className="flex items-center gap-3">
+                                <span className={`material-symbols-outlined text-2xl ${selectedType === 'station' ? 'text-purple-400' : 'text-sky-400'}`}>
+                                    {selectedType === 'station' ? 'water_drop' : 'directions_car'}
+                                </span>
+                                <div>
+                                    <h2 className="text-sm font-black text-white uppercase tracking-wider">
+                                        {currentItem.nombre || currentItem.placa_principal || currentItem.codigo_patrimonial} — Historial
+                                    </h2>
+                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{selectedType === 'station' ? 'Estación' : 'Vehículo'}</span>
+                                </div>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${selectedType === 'station' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' : 'bg-sky-500/10 text-sky-400 border-sky-500/20'}`}>
                                 {selectedType === 'station' ? currentItem.tipo : currentItem.tipo_unidad}
                             </span>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-xs">
+                        <div className="overflow-x-auto no-scrollbar">
+                            <table className="w-full text-left border-collapse table-premium">
                                 <thead>
-                                    <tr className="border-b border-slate-700/50">
-                                        <th className="text-left px-3 py-2 text-[10px] font-black text-slate-400 uppercase">Fecha</th>
-                                        <th className="text-left px-3 py-2 text-[10px] font-black text-slate-400 uppercase">Tipo</th>
-                                        <th className="text-left px-3 py-2 text-[10px] font-black text-slate-400 uppercase hidden md:table-cell">Actividad</th>
-                                        <th className="text-left px-3 py-2 text-[10px] font-black text-slate-400 uppercase">Descripción</th>
-                                        <th className="text-right px-3 py-2 text-[10px] font-black text-slate-400 uppercase hidden sm:table-cell">Horas</th>
-                                        <th className="text-right px-3 py-2 text-[10px] font-black text-slate-400 uppercase">Costo</th>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th className="hidden md:table-cell">Actividad</th>
+                                        <th>Descripción</th>
+                                        <th className="hidden sm:table-cell text-right">Horas</th>
+                                        <th className="text-right">Costo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {maintenanceLog.map((m, i) => (
-                                        <tr key={m.id || i} className="border-b border-slate-700/30 hover:bg-slate-700/20">
-                                            <td className="px-3 py-2 font-mono text-slate-300 whitespace-nowrap">{(m.fecha || '').split('T')[0]}</td>
-                                            <td className="px-3 py-2">
-                                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-black uppercase ${tipoColors[m.tipo] || tipoColors[m.clasificacion_falla] || 'bg-slate-500/20 text-slate-400'}`}>
+                                        <tr key={m.id || i} className="hover:bg-slate-800/40 transition-colors">
+                                            <td className="font-mono text-xs text-slate-300 whitespace-nowrap">{(m.fecha || '').split('T')[0]}</td>
+                                            <td>
+                                                <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${tipoColors[m.tipo] || tipoColors[m.clasificacion_falla] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'} ${m.tipo === 'preventivo' ? 'border-emerald-500/20' : m.tipo === 'correctivo' ? 'border-red-500/20' : m.tipo === 'emergencia' ? 'border-amber-500/20' : ''}`}>
                                                     {m.tipo || m.clasificacion_falla || '—'}
                                                 </span>
                                             </td>
-                                            <td className="px-3 py-2 font-mono text-sky-400 hidden md:table-cell">{m.activity_code || '—'}</td>
-                                            <td className="px-3 py-2 text-white max-w-[200px] truncate">{m.descripcion || '—'}</td>
-                                            <td className="px-3 py-2 text-right text-slate-300 hidden sm:table-cell">{(m.horas_trabajadas || m.duracion_horas) ? `${m.horas_trabajadas || m.duracion_horas}h` : '—'}</td>
-                                            <td className="px-3 py-2 text-right text-emerald-400 font-bold">{(m.costo || m.costo_reparacion) ? `S/ ${Number(m.costo || m.costo_reparacion).toFixed(2)}` : '—'}</td>
+                                            <td className="font-mono text-xs text-cyan-400 font-bold hidden md:table-cell">{m.activity_code || '—'}</td>
+                                            <td className="text-sm text-slate-200 max-w-[250px] truncate">{m.descripcion || '—'}</td>
+                                            <td className="text-right text-sm text-slate-300 font-medium hidden sm:table-cell">{(m.horas_trabajadas || m.duracion_horas) ? `${m.horas_trabajadas || m.duracion_horas}h` : '—'}</td>
+                                            <td className="text-right text-sm text-emerald-400 font-black">{(m.costo || m.costo_reparacion) ? `S/ ${Number(m.costo || m.costo_reparacion).toFixed(2)}` : '—'}</td>
                                         </tr>
                                     ))}
-                                    {maintenanceLog.length === 0 && <tr><td colSpan={6} className="text-center py-6 text-slate-500">Sin registros</td></tr>}
+                                    {maintenanceLog.length === 0 && (
+                                        <tr>
+                                            <td colSpan={6} className="text-center py-12">
+                                                <div className="flex flex-col items-center justify-center text-slate-500">
+                                                    <span className="material-symbols-outlined text-4xl mb-3 opacity-50">history_toggle_off</span>
+                                                    <span className="text-xs font-bold uppercase tracking-widest">Sin registros en este periodo</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </>
-            ) : (
-                <div className="text-center py-12 text-slate-500">
-                    <span className="material-symbols-outlined text-4xl block mb-2">swap_horiz</span>
-                    Selecciona un vehículo o estación para ver su historial
+                <div className="flex flex-col items-center justify-center py-24 text-slate-500 bg-slate-900/20 rounded-[2rem] border border-slate-800/50 border-dashed backdrop-blur-sm">
+                    <div className="w-20 h-20 bg-slate-800/50 rounded-3xl flex items-center justify-center mb-6 shadow-inner border border-slate-700/50">
+                        <span className="material-symbols-outlined text-5xl text-slate-400 animate-pulse">troubleshoot</span>
+                    </div>
+                    <h3 className="text-lg font-black text-white uppercase tracking-widest mb-2">Modo de Consulta Activo</h3>
+                    <p className="text-sm font-medium text-slate-400 max-w-md text-center">Selecciona un vehículo o estación en los filtros superiores para desplegar su historial completo de mantenimiento, costos y horas invertidas.</p>
                 </div>
-            )}
 
             {/* Formulario */}
             {showForm && currentItem && (

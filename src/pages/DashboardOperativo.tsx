@@ -150,7 +150,7 @@ export default function DashboardOperativo() {
             {isFleetMode && kpi && (
                 <>
                     {/* KPIs Flota - Estilo Premium */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
                         <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-emerald-500/20 rounded-[2rem] p-8 shadow-2xl hover:shadow-emerald-500/10 hover:border-emerald-500/40 transition-all duration-500 group">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
@@ -170,13 +170,40 @@ export default function DashboardOperativo() {
                             <div className="flex items-center justify-between mb-6">
                                 <div>
                                     <span className="text-[10px] font-black text-amber-400 uppercase tracking-[0.3em] block mb-3">MTTR Estimado</span>
-                                    <div className="text-5xl lg:text-6xl font-black text-white tracking-tighter">{kpi.mttr_global?.toFixed(1) ?? '—'}<span className="text-2xl text-slate-500 ml-2">h</span></div>
+                                    {kpi.fallas_correctivas === 0 ? (
+                                        <div className="text-3xl lg:text-4xl font-black text-emerald-400 tracking-tighter mt-2 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-3xl">verified</span>
+                                            SIN FALLAS
+                                        </div>
+                                    ) : (
+                                        <div className="text-5xl lg:text-6xl font-black text-white tracking-tighter">{kpi.mttr_global?.toFixed(1) ?? '—'}<span className="text-2xl text-slate-500 ml-2">h</span></div>
+                                    )}
                                 </div>
                                 <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-amber-600/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner border border-amber-500/20">
                                     <span className="material-symbols-outlined text-amber-400 text-3xl">timer</span>
                                 </div>
                             </div>
                             <div className="text-[10px] bg-amber-500/10 border border-amber-500/20 inline-block px-4 py-1.5 rounded-lg text-amber-300 font-black uppercase tracking-[0.2em]">Meta: &lt;5.0h</div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-blue-500/20 rounded-[2rem] p-8 shadow-2xl hover:shadow-blue-500/10 hover:border-blue-500/40 transition-all duration-500 group">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.3em] block mb-3">MTBF Confiabilidad</span>
+                                    {kpi.fallas_correctivas === 0 ? (
+                                        <div className="text-3xl lg:text-4xl font-black text-emerald-400 tracking-tighter mt-2 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-3xl">verified</span>
+                                            SIN FALLAS
+                                        </div>
+                                    ) : (
+                                        <div className="text-5xl lg:text-6xl font-black text-white tracking-tighter">{kpi.mtbf_global?.toFixed(1) ?? '—'}<span className="text-2xl text-slate-500 ml-2">h</span></div>
+                                    )}
+                                </div>
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner border border-blue-500/20">
+                                    <span className="material-symbols-outlined text-blue-400 text-3xl">update</span>
+                                </div>
+                            </div>
+                            <div className="text-[10px] bg-blue-500/10 border border-blue-500/20 inline-block px-4 py-1.5 rounded-lg text-blue-300 font-black uppercase tracking-[0.2em]">Meta: &gt;100h</div>
                         </div>
 
                         <div className="bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-xl border border-rose-500/20 rounded-[2rem] p-8 shadow-2xl hover:shadow-rose-500/10 hover:border-rose-500/40 transition-all duration-500 group">

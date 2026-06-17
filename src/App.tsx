@@ -18,6 +18,7 @@ import ControlPTAP from './pages/ControlPTAP'
 import EstacionesHidricas from './pages/EstacionesHidricas'
 import MantenimientoIntegrado from './pages/MantenimientoIntegrado'
 import PlanMantenimiento2026 from './pages/PlanMantenimiento2026'
+import ProduccionOPAPTAR from './pages/ProduccionOPAPTAR'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import UserManagement from './pages/UserManagement'
@@ -44,6 +45,7 @@ const menuItems = [
             { path: '/monitoreo-agua', label: 'Control Hídrico', icon: 'water_drop', appliesTo: 'stations' },
             { path: '/control-ptap', label: 'PTAP Portachuelo', icon: 'settings_input_component', appliesTo: 'stations' },
             { path: '/estaciones', label: 'Maestro Estaciones', icon: 'location_on', appliesTo: 'stations' },
+            { path: '/produccion-opaptar', label: 'Producción OPAPTAR', icon: 'precision_manufacturing', appliesTo: 'stations' },
         ]
     },
     {
@@ -54,6 +56,17 @@ const menuItems = [
     {
         section: 'Mi Cuenta', items: [
             { path: '/mi-perfil', label: 'Configuración Perfil', icon: 'person_settings', appliesTo: 'all' },
+        ]
+    }
+]
+
+const produccionMenuItems = [
+    {
+        section: 'Producción OPAPTAR', items: [
+            { path: '/produccion-opaptar/operacion', label: 'Operación Diaria', icon: 'edit_calendar', appliesTo: 'all' },
+            { path: '/produccion-opaptar/surtidor', label: 'Despacho de Agua', icon: 'local_shipping', appliesTo: 'all' },
+            { path: '/produccion-opaptar/rsanjuan', label: 'Río San Juan', icon: 'water', appliesTo: 'all' },
+            { path: '/produccion-opaptar/dashboard', label: 'Dashboard Ejecutivo', icon: 'analytics', appliesTo: 'all' },
         ]
     }
 ]
@@ -148,6 +161,7 @@ function MainLayout() {
     // Determinar qué menú mostrar según la ruta actual
     const isPTAPModule = location.pathname.startsWith('/control-ptap')
     const isWaterModule = location.pathname.startsWith('/monitoreo-agua')
+    const isProduccionModule = location.pathname.startsWith('/produccion-opaptar')
 
     const isMaintenanceModule = !isPTAPModule && !isWaterModule && (
         location.pathname.includes('/dashboard') ||
@@ -165,6 +179,7 @@ function MainLayout() {
     let currentMenu = [...menuItems];
     if (isPTAPModule) currentMenu = [...ptapMenuItems];
     else if (isWaterModule) currentMenu = [...waterMenuItems];
+    else if (isProduccionModule) currentMenu = [...produccionMenuItems];
 
     // Inyectar sección de administración universal para gerencia o DanielAdmin
     if (isAdminUser && !currentMenu.some(s => s.section === 'Administración')) {
@@ -315,6 +330,7 @@ function MainLayout() {
                             <Route path="/apm" element={<APMDesempenio />} />
                             <Route path="/monitoreo-agua/*" element={<MonitoreoAgua />} />
                             <Route path="/control-ptap/*" element={<ControlPTAP />} />
+                            <Route path="/produccion-opaptar/*" element={<ProduccionOPAPTAR />} />
                             <Route path="/estaciones" element={<EstacionesHidricas />} />
                             <Route path="/mantenimiento" element={<MantenimientoIntegrado />} />
                             <Route path="/plan-2026" element={<PlanMantenimiento2026 />} />
@@ -382,6 +398,16 @@ function HomeModules() {
             color: 'from-violet-500 to-purple-600',
             shadow: 'shadow-violet-900/40',
             route: '/monitoreo-agua'
+        },
+        {
+            id: 'produccion',
+            title: 'Producción OPAPTAR',
+            subtitle: 'Pozos + EBAP + PTAP',
+            icon: 'precision_manufacturing',
+            description: 'Producción de agua potable y tratamiento de aguas residuales.',
+            color: 'from-amber-500 to-orange-600',
+            shadow: 'shadow-amber-900/40',
+            route: '/produccion-opaptar'
         }
     ]
 
@@ -444,7 +470,7 @@ function HomeModules() {
                 </p>
 
                 {/* Grid de Módulos - 3 Columnas Pro Premium */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto animate-reveal" style={{ animationDelay: '0.8s' }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto animate-reveal" style={{ animationDelay: '0.8s' }}>
                     {modules.map((module) => (
                         <button
                             key={module.id}
@@ -455,7 +481,7 @@ function HomeModules() {
                             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/[0.02] rounded-full blur-3xl group-hover:bg-cyan-500/10 transition-colors duration-700"></div>
                             <div className="absolute top-6 right-8 opacity-[0.05] group-hover:opacity-10 transition-all duration-500">
                                 <span className="material-symbols-outlined text-6xl text-white select-none pointer-events-none">
-                                    {module.id === 'mantenimiento' ? 'precision_manufacturing' : module.id === 'ptap' ? 'water_full' : 'water_pressure'}
+                                    {module.id === 'mantenimiento' ? 'precision_manufacturing' : module.id === 'ptap' ? 'water_full' : module.id === 'presion' ? 'water_pressure' : 'manufacturing'}
                                 </span>
                             </div>
 

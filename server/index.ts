@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
 import { initDb } from './database.js'
 import { seedCatalogs } from './seed.js'
 import path from 'path'
@@ -18,15 +19,41 @@ import { waterRouter } from './routes/water.js'
 import { stationsRouter } from './routes/stations.js'
 import { authRouter } from './routes/auth.js'
 import { iaRouter } from './routes/ia.js'
+import { produccionRouter } from './routes/produccion.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PORT = Number(process.env.PORT) || 3001
 
+const allowedOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
+    : ['http://localhost:5173', 'http://localhost:4173']
+
 async function main() {
     const app = express()
     app.use(helmet())
-    app.use(cors())
+    app.use(cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true)
+            } else {
+                callback(new Error(`Origen no permitido: ${origin}`))
+            }
+        },
+        credentials: true,
+    }))
+
+    // Rate limiting en endpoints de autenticación
+    const authLimiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        max: 10,
+        message: { error: 'Demasiados intentos. Intenta de nuevo en 15 minutos.' },
+        standardHeaders: true,
+        legacyHeaders: false,
+    })
+    app.use('/api/auth/login', authLimiter)
+    app.use('/api/auth/register', authLimiter)
+
     app.use(express.json({ limit: '10mb' }))
     app.use(express.urlencoded({ limit: '10mb', extended: true }))
 
@@ -43,6 +70,7 @@ async function main() {
     app.use('/api/water', waterRouter)
     app.use('/api/stations', stationsRouter)
     app.use('/api/ia', iaRouter)
+    app.use('/api/produccion', produccionRouter)
 
     app.get('/api/health', (_req, res) => {
         res.json({ status: 'ok', port: PORT })

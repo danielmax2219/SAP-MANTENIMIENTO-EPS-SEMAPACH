@@ -2,8 +2,12 @@
 import pg from 'pg';
 import https from 'https';
 
-const PG_URL = 'postgresql://postgres.sschzcbnwokfwfwygbyn:Asdqwerty.,$2219@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require';
-const WEB_BASE_URL = 'https://semapach-mantenimiento-production.up.railway.app';
+const PG_URL = process.env.DATABASE_URL;
+if (!PG_URL) {
+    console.error('❌ DATABASE_URL no definida. Configúrala en .env o variable de entorno.');
+    process.exit(1);
+}
+const WEB_BASE_URL = process.env.WEB_BASE_URL || 'https://semapach-mantenimiento-production.up.railway.app';
 
 const pool = new pg.Pool({
     connectionString: PG_URL,

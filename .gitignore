@@ -8,4 +8,10 @@ dist
 scratch
 *.log
 .gemini
-package-lock.json (opcional, pero mejor ignorarlo si vas a usar npm install fresco)
+package-lock.json
+
+# Archivos temporales y debug
+temp_*.json
+db_results.json
+db_summary.json
+schema.json

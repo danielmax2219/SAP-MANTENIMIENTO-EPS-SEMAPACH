@@ -87,6 +87,33 @@ export const api = {
     getKPIGlobal: (desde: string, hasta: string, sector?: string) => request<any>(`/kpi/global?desde=${desde}&hasta=${hasta}${sector && sector !== 'General' ? '&sector=' + encodeURIComponent(sector) : ''}`),
     getKPIPorActivo: (desde: string, hasta: string, sector?: string) => request<any[]>(`/kpi/por-activo?desde=${desde}&hasta=${hasta}${sector && sector !== 'General' ? '&sector=' + encodeURIComponent(sector) : ''}`),
 
+    // === Producción OPAPTAR ===
+    getProduccionBD: (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+        return request<any[]>(`/produccion/bd${qs}`)
+    },
+    bulkCreateProduccionBD: (rows: any[]) => request<any>('/produccion/bd/bulk', { method: 'POST', body: JSON.stringify({ rows }) }),
+    getProduccionSurtidor: (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+        return request<any[]>(`/produccion/surtidor${qs}`)
+    },
+    bulkCreateProduccionSurtidor: (rows: any[]) => request<any>('/produccion/surtidor/bulk', { method: 'POST', body: JSON.stringify({ rows }) }),
+    getProduccionRSanjuan: (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : ''
+        return request<any[]>(`/produccion/rsanjuan${qs}`)
+    },
+    bulkCreateProduccionRSanjuan: (rows: any[]) => request<any>('/produccion/rsanjuan/bulk', { method: 'POST', body: JSON.stringify({ rows }) }),
+    getProduccionDashboard: () => request<any>('/produccion/dashboard'),
+    uploadProduccionExcel: (file: File, tipo: string) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        return fetch(`${API_BASE}/produccion/import?tipo=${tipo}`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+        }).then(r => r.json())
+    },
+
     // === Monitoreo de Agua ===
     getWaterReadings: (params: { fecha?: string; inicio?: string; fin?: string }) => {
         const qs = '?' + new URLSearchParams(params as any).toString()

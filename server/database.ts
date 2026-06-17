@@ -1,13 +1,16 @@
 import pg from 'pg'
 
-const cleanPgUrl = (process.env.DATABASE_URL || 'postgresql://postgres.sschzcbnwokfwfwygbyn:Asdqwerty.,$2219@aws-0-us-west-2.pooler.supabase.com:6543/postgres').split('?')[0]
-
-console.log('[DB] Inicializando Pool con:', cleanPgUrl.substring(0, 30) + '...')
+const DATABASE_URL = process.env.DATABASE_URL
+if (!DATABASE_URL) {
+    console.error('[DB] ❌ DATABASE_URL no definida. Revisa tu archivo .env')
+    process.exit(1)
+}
+const cleanPgUrl = DATABASE_URL.split('?')[0]
 
 const pool = new pg.Pool({
     connectionString: cleanPgUrl,
     ssl: { rejectUnauthorized: false },
-    connectionTimeoutMillis: 10000,
+    connectionTimeoutMillis: 15000,
 })
 
 pool.on('error', (err) => {
@@ -124,6 +127,60 @@ export async function initDb() {
             // Fix previo: 'station' a 'stations' para consistencia con frontend
             `UPDATE assets SET categoria = 'stations' WHERE categoria = 'station'`,
 
+            // === PRODUCCIÓN OPAPTAR 2026 ===
+            `CREATE TABLE IF NOT EXISTS produccion_bd (
+                id SERIAL PRIMARY KEY, mes INTEGER NOT NULL, dia INTEGER NOT NULL,
+                fecha DATE, pz10_caudal REAL DEFAULT 0, pz10_horas REAL DEFAULT 0,
+                pz10_inicio REAL DEFAULT 0, pz10_final REAL DEFAULT 0, pz10_m3 REAL DEFAULT 0,
+                pz11_caudal REAL DEFAULT 0, pz11_horas REAL DEFAULT 0,
+                pz11_inicio REAL DEFAULT 0, pz11_final REAL DEFAULT 0, pz11_m3 REAL DEFAULT 0,
+                pz13_caudal REAL DEFAULT 0, pz13_horas REAL DEFAULT 0,
+                pz13_inicio REAL DEFAULT 0, pz13_final REAL DEFAULT 0, pz13_m3 REAL DEFAULT 0,
+                pzmed_caudal REAL DEFAULT 0, pzmed_horas REAL DEFAULT 0,
+                pzmed_inicio REAL DEFAULT 0, pzmed_final REAL DEFAULT 0, pzmed_m3 REAL DEFAULT 0,
+                gfmin_caudal REAL DEFAULT 0, gfmin_horas REAL DEFAULT 0,
+                gfmin_inicio REAL DEFAULT 0, gfmin_final REAL DEFAULT 0, gfmin_m3 REAL DEFAULT 0,
+                ptap1_caudal REAL DEFAULT 0, ptap1_horas REAL DEFAULT 0,
+                ptap1_inicio REAL DEFAULT 0, ptap1_final REAL DEFAULT 0, ptap1_m3 REAL DEFAULT 0,
+                gfnar_caudal REAL DEFAULT 0, gfnar_horas REAL DEFAULT 0,
+                gfnar_inicio REAL DEFAULT 0, gfnar_final REAL DEFAULT 0, gfnar_m3 REAL DEFAULT 0,
+                pzchb_caudal REAL DEFAULT 0, pzchb_horas REAL DEFAULT 0,
+                pzchb_inicio REAL DEFAULT 0, pzchb_final REAL DEFAULT 0, pzchb_m3 REAL DEFAULT 0,
+                pzcm_caudal REAL DEFAULT 0, pzcm_horas REAL DEFAULT 0,
+                pzcm_inicio REAL DEFAULT 0, pzcm_final REAL DEFAULT 0, pzcm_m3 REAL DEFAULT 0,
+                pztm_caudal REAL DEFAULT 0, pztm_horas REAL DEFAULT 0,
+                pztm_inicio REAL DEFAULT 0, pztm_final REAL DEFAULT 0, pztm_m3 REAL DEFAULT 0,
+                ebaphija_caudal REAL DEFAULT 0, ebaphija_horas REAL DEFAULT 0,
+                ebaphija_inicio REAL DEFAULT 0, ebaphija_final REAL DEFAULT 0, ebaphija_m3 REAL DEFAULT 0,
+                ebapalar_caudal REAL DEFAULT 0, ebapalar_horas REAL DEFAULT 0,
+                ebapalar_inicio REAL DEFAULT 0, ebapalar_final REAL DEFAULT 0, ebapalar_m3 REAL DEFAULT 0,
+                ebappnue_caudal REAL DEFAULT 0, ebappnue_horas REAL DEFAULT 0,
+                ebappnue_inicio REAL DEFAULT 0, ebappnue_final REAL DEFAULT 0, ebappnue_m3 REAL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS produccion_surtidor (
+                id SERIAL PRIMARY KEY, num_sem INTEGER, mes INTEGER, anio INTEGER,
+                fecha DATE, surtidor VARCHAR(50), itm INTEGER, placa VARCHAR(50),
+                tvehiculo VARCHAR(100), volumen_gln REAL DEFAULT 0, volumen_m3 REAL DEFAULT 0,
+                consumo_ca REAL DEFAULT 0, programa VARCHAR(100),
+                hipoclorito REAL DEFAULT 0, cloro_residual REAL DEFAULT 0,
+                hora TEXT, operador VARCHAR(200),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS produccion_rsanjuan (
+                id SERIAL PRIMARY KEY, anio INTEGER, mes INTEGER,
+                fecha TEXT, hora TEXT, caudal REAL DEFAULT 0,
+                etiqueta TEXT, caudal_max REAL DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS produccion_dashboard (
+                id SERIAL PRIMARY KEY, fecha_reporte DATE, semana INTEGER,
+                titulo TEXT, valor TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            // Unique constraints for produccion tables (for ON CONFLICT DO NOTHING)
+            `CREATE UNIQUE INDEX IF NOT EXISTS idx_produccion_bd_fecha ON produccion_bd(fecha)`,
+            `CREATE UNIQUE INDEX IF NOT EXISTS idx_produccion_surtidor_row ON produccion_surtidor(fecha, surtidor, itm, placa)`,
+            `CREATE UNIQUE INDEX IF NOT EXISTS idx_produccion_rsanjuan_row ON produccion_rsanjuan(fecha, hora)`,
         ]
         for (const sql of migrations) {
             try { await pool.query(sql) } catch (e: any) {

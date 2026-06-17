@@ -8,8 +8,12 @@ import initSqlJs from 'sql.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// URI de Supavisor (Soporta IPv4)
-const PG_URL = 'postgresql://postgres.sschzcbnwokfwfwygbyn:Asdqwerty.,$2219@aws-0-us-west-2.pooler.supabase.com:6543/postgres?sslmode=require';
+// URI de Supavisor (Soporta IPv4) — configurar en .env o variable de entorno
+const PG_URL = process.env.DATABASE_URL;
+if (!PG_URL) {
+    console.error('❌ DATABASE_URL no definida. Configúrala en .env o variable de entorno.');
+    process.exit(1);
+}
 const SQLITE_PATH = path.join(__dirname, 'mantenimiento.db');
 
 async function migrate() {

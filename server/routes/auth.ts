@@ -88,7 +88,7 @@ authRouter.post('/login', async (req, res) => {
     const { identifier, password } = req.body  // identifier puede ser username o DNI
 
     try {
-        const user = await dbGet('SELECT * FROM users WHERE username = ? OR dni = ?', identifier, identifier)
+        const user = await dbGet('SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR dni = ?', identifier, identifier)
         if (!user) return res.status(401).json({ message: 'Credenciales inválidas' })
 
         if (user.status !== 'approved') {
